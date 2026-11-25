@@ -44,11 +44,14 @@ def reserve_name(directory, suggested):
 def save_download(download, directory, show_url=False):
     target = reserve_name(directory, download.suggested_filename)
     try:
+        expected_size = Path(download.path()).stat().st_size
         download.save_as(str(target))
+        if target.stat().st_size != expected_size:
+            raise OSError("Saved file size differs from the completed browser download.")
     except Exception:
         target.unlink(missing_ok=True)
         raise
-    print(f"Saved: {target}", flush=True)
+    print(f"Saved: {target} ({expected_size} bytes)", flush=True)
     if show_url:
         u = urlsplit(download.url)
         if u.scheme == "https" and u.hostname and u.username is None and u.password is None:
