@@ -32,6 +32,8 @@ class TestDownloader(unittest.TestCase):
         class Download:
             suggested_filename = "file.txt"
             url = "https://example.test/file"
+            def path(self):
+                return source
             def save_as(self, filename):
                 Path(filename).write_bytes(b"hello")
         class Failure(Download):
@@ -40,11 +42,18 @@ class TestDownloader(unittest.TestCase):
                 raise OSError("failed")
         with tempfile.TemporaryDirectory() as d:
             folder = Path(d)
+            source = folder / "browser-temp"
+            source.write_bytes(b"hello")
             saved = save_download(Download(), folder)
             self.assertEqual(saved.read_bytes(), b"hello")
             with self.assertRaises(OSError):
                 save_download(Failure(), folder)
-            self.assertEqual(list(folder.iterdir()), [saved])
+            class Truncated(Download):
+                def save_as(self, filename):
+                    Path(filename).write_bytes(b"he")
+            with self.assertRaisesRegex(OSError, "size differs"):
+                save_download(Truncated(), folder)
+            self.assertEqual(set(folder.iterdir()), {source, saved})
 
 
 if __name__ == "__main__":
