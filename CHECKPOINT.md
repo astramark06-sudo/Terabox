@@ -6,4 +6,6 @@ The reference implementation documents recursive enumeration with configured ses
 
 Existing verification: four offline unit tests passed in the previous implementation run. No code changed in this checkpoint.
 
-Next action: with permission to disclose the share URL to the independent downloader, test its browser interface. If it returns authorized downloadable items, inventory nested files, verify their sizes and available source hashes, then package and verify the archive. Keep the share URL, file inventory, credentials and signed links private.
+The authorized interactive resolver test succeeded in listing 18 PDF entries, reported total 8.6 GB. Download All produced no confirmed transfer. An individual download button produced a start notification but its reported new tab was absent from the browser inventory. No saved bytes or checksums were verified. No app or user account was used.
+
+Next action: in a browser with observable file transfers, inspect the download manager after Download All, then reconcile completed files against all 18 entries and source sizes before packaging.
